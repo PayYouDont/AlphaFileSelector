@@ -30,7 +30,7 @@ public abstract class CardView<T> extends LinearLayout {
     public CardView(Context context) {
         super (context);
     }
-    protected View create(List<T> tList,int resource,List<View> views){
+    protected View init(List<T> tList,int resource,List<View> views){
         root = LayoutInflater.from(getContext ()).inflate(R.layout.layout_card, this, true);
         typeLayout = findViewById (R.id.card_resources_typeLayout);
         typeLayout.setOnClickListener (v -> {

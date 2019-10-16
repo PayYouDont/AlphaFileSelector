@@ -21,9 +21,9 @@ public class ImageCardView extends CardView<ImageBean>{
     }
     @Override
     void setViewData() {
-        
+
     }
     public View create(){
-       return super.create (imageBeanList,resource,views);
+       return init (imageBeanList,resource,views);
     }
 }
