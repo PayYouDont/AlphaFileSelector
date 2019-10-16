@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="card_margin_vertical">16pt</dimen>
+    <dimen name="card_margin_horizontal">10pt</dimen>
+    <dimen name="card_text_size_20">20dp</dimen>
+    <dimen name="card_text_size_18">18dp</dimen>
+    <dimen name="card_text_size_16">16dp</dimen>
+    <dimen name="card_text_size_14">14dp</dimen>
+</resources>
