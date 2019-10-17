@@ -18,24 +18,27 @@ public class CardContentAdapter<T> extends RecyclerView.Adapter{
     @Getter
     private View root;
     @Setter
-    private List<View> views;
+    private List<Integer> resources;
     @Setter
     private OnSelectItemListener onSelectItemListener;
+    @Setter
+    private View.OnLongClickListener onLongClickListener;
     @Setter
     private OnSetContetnViewListener<T> onSetContetnViewListener;
     CardViewHolder holder;
 
-    public CardContentAdapter(List<T> tList, int resource, List<View> views) {
+    public CardContentAdapter(List<T> tList, int resource, List<Integer> resources) {
         this.tList = tList;
         this.resource = resource;
-        this.views = views;
+        this.resources = resources;
     }
 
-    public CardContentAdapter(List<T> tList, int resource, List<View> views, OnSelectItemListener onSelectItemListener, OnSetContetnViewListener<T> onSetContetnViewListener) {
+    public CardContentAdapter(List<T> tList, int resource, List<Integer> resources, OnSelectItemListener onSelectItemListener, View.OnLongClickListener onLongClickListener, OnSetContetnViewListener<T> onSetContetnViewListener) {
         this.tList = tList;
         this.resource = resource;
-        this.views = views;
+        this.resources = resources;
         this.onSelectItemListener = onSelectItemListener;
+        this.onLongClickListener = onLongClickListener;
         this.onSetContetnViewListener = onSetContetnViewListener;
     }
 
@@ -43,15 +46,19 @@ public class CardContentAdapter<T> extends RecyclerView.Adapter{
     @Override
     public CardViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         root = LayoutInflater.from (parent.getContext ()).inflate (resource,parent,false);
-        holder = new CardViewHolder (root,views);
-        holder.consumeTypeView.setOnClickListener (v -> {
+        holder = new CardViewHolder (root,resources);
+        holder.consumeTypeView.setOnClickListener (view -> {
             if(onSelectItemListener!=null){
                 onSelectItemListener.onSelect (holder.getAdapterPosition ());
             }
-
         });
+        if(onLongClickListener!=null){
+            holder.consumeTypeView.setOnLongClickListener (onLongClickListener);
+        }
         return holder;
     }
+
+
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
@@ -66,11 +73,10 @@ public class CardContentAdapter<T> extends RecyclerView.Adapter{
     public int getItemCount() {
         return tList.size ();
     }
-
-    public interface OnSelectItemListener{
-        void onSelect(int position);
-    }
     public interface OnSetContetnViewListener<T>{
         void setViews(List<View> views,T t);
+    }
+    public interface OnSelectItemListener{
+        void onSelect(int position);
     }
 }

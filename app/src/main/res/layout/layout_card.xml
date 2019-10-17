@@ -50,6 +50,7 @@
                     android:background="@drawable/ic_arrow"/>
         </LinearLayout>
         <GridLayout
+                android:id="@+id/grid_test"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
