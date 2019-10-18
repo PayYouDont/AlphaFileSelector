@@ -1,43 +1,42 @@
 package com.payudn.selector.adapter;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class GridLayoutItemDecoration extends RecyclerView.ItemDecoration {
-    private int space;
-    private int count;
-    private Paint paint;
-    public GridLayoutItemDecoration(int space,int count) {
-        this.space = space;
-        this.count = count;
-        paint = new Paint();
-        paint.setAlpha(200); // 设置alpha不透明度,范围为0~255
-        paint.setColor(Color.parseColor("#7C7C7C"));
-        paint.setStrokeWidth(1);
-    }
+    private int spanCount;
+    private int dividerWidth;
+    private int dividerWidthTop;
+    private int dividerWidthBot;
 
+    private Paint dividerPaint;
+    /**
+     * @param spanCount gridLayoutManager 列数
+     * @param space 分割块宽高,单位:dp
+     */
+    public GridLayoutItemDecoration(Context context, int spanCount, int space) {
+        this.spanCount = spanCount;
+
+        this.dividerPaint = new Paint();
+        this.dividerPaint.setColor(Color.BLUE);
+
+        this.dividerWidth = dip2px(context, space);
+        this.dividerWidthTop = dividerWidth / 2;
+        this.dividerWidthBot = -dividerWidthTop;
+
+    }
     @Override
     public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+        System.out.println ("leftMargin="+((ViewGroup.MarginLayoutParams)(parent.getChildAt (0).getLayoutParams ())).leftMargin);
         super.onDraw (c, parent, state);
-        for (int i = 0; i < parent.getChildCount(); i++) {
-            View childView = parent.getChildAt(i);
-            //——
-            //上
-            c.drawLine (childView.getX ()-1,childView.getY ()-1,childView.getX ()+childView.getWidth ()+1,childView.getY ()-1,paint);
-            //|左
-            c.drawLine (childView.getX ()-1,childView.getY ()-1,childView.getX ()-1,childView.getY ()+childView.getHeight ()+1,paint);
-            //右|
-            c.drawLine (childView.getX ()+childView.getWidth ()+1,childView.getY ()-1,childView.getX ()+childView.getWidth ()+1,childView.getY ()+childView.getHeight ()+1,paint);
-            //下
-            //——
-            c.drawLine (childView.getX ()-1,childView.getY ()+childView.getHeight ()+1,childView.getX ()+childView.getWidth ()-1,childView.getY ()+childView.getHeight ()+1,paint);
-        }
     }
 
     @Override
@@ -47,15 +46,19 @@ public class GridLayoutItemDecoration extends RecyclerView.ItemDecoration {
 
     @Override
     public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-        outRect.left = space;
-        outRect.bottom = space;
-        if(parent.getChildLayoutPosition (view)<count){//第一排
-            outRect.top = 1;
-        }
-        if(parent.getChildLayoutPosition (view)%count==0){
-            outRect.left = 1;
-        }else if((parent.getChildLayoutPosition (view)+1)%count==0){
-            outRect.right = 2;
-        }
+        super.getItemOffsets(outRect, view, parent, state);
+        int pos = parent.getChildAdapterPosition(view);
+        int column = (pos) % spanCount;// 计算这个child 处于第几列
+        outRect.top = dividerWidthTop;
+        outRect.bottom = dividerWidthBot;
+        outRect.left = (column * dividerWidth / spanCount);
+        outRect.right = dividerWidth - (column + 1) * dividerWidth / spanCount;
+    }
+    /**
+     * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
+     */
+    public static int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
     }
 }

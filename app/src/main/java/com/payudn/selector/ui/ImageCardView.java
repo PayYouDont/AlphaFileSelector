@@ -1,13 +1,17 @@
 package com.payudn.selector.ui;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.payudn.selector.R;
+import com.payudn.selector.adapter.GridLayoutItemDecoration;
 import com.payudn.selector.entity.MediaBean;
 import com.payudn.selector.util.FileUtil;
 
@@ -18,16 +22,18 @@ public class ImageCardView extends CardView<MediaBean>{
     private List<MediaBean> imageBeanList;
     private List<Integer> resources;
     private int resource;
+    int coverMargin;
     public ImageCardView(Context context, List<MediaBean> imageBeanList) {
         super (context);
         this.imageBeanList = imageBeanList;
-
     }
     public View create(){
         resource = R.layout.image_card_item;
         resources = new ArrayList<> ();
         resources.add (R.id.image_content);
         resources.add (R.id.image_check_btn);
+        setSpace (10);
+        coverMargin = GridLayoutItemDecoration.dip2px (getContext (),space);
         setOnLongClickListener (view -> {
             eidtStatus = true;
             setEidt();
@@ -36,7 +42,11 @@ public class ImageCardView extends CardView<MediaBean>{
         setOnSetContetnViewListener ((views, imageBean) -> views.forEach (v -> {
                 if(v.getId () == R.id.image_content){
                     ImageView imageView = (ImageView )v;
-                    imageView.setImageBitmap (FileUtil.parseToBitmap (imageBean,320,320));
+                    Point p = new Point ();
+                    getRoot ().getDisplay ().getSize (p);
+                    int width = (p.x-3*space-2)/4;
+                    Bitmap bitmap = FileUtil.parseToBitmap (imageBean,width,width,25,1);
+                    imageView.setImageBitmap (bitmap);
                 }else if(v.getId () == R.id.image_check_btn){
                     CheckBox checkBox = (CheckBox)v;
                     checkBox.setOnCheckedChangeListener ((compoundButton, b) -> {
@@ -76,7 +86,20 @@ public class ImageCardView extends CardView<MediaBean>{
             }
         });
         if(checkBox.getParent () instanceof RelativeLayout){
-            ((RelativeLayout)checkBox.getParent ()).setOnClickListener (v-> checkBox.performClick ());
+            RelativeLayout relativeLayout = (RelativeLayout)checkBox.getParent ();
+            relativeLayout.setOnClickListener (v-> checkBox.performClick ());
+            MarginLayoutParams params = (MarginLayoutParams) relativeLayout.getLayoutParams ();
+            Point imageSize = new Point ();
+            ImageView imageView = getCardContentAdapter ().getRoot ().findViewById (R.id.image_content);
+
+            if(imageView!=null){
+                imageSize.x = imageView.getWidth ();
+                imageSize.y = imageView.getHeight ()- coverMargin;
+                params.width = imageSize.x;
+                params.height = imageSize.y;
+                params.topMargin = coverMargin/2;
+                relativeLayout.setLayoutParams (params);
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.payudn.selector.ui;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,9 +36,12 @@ public class CardView<T> extends LinearLayout {
     protected CardContentAdapter.OnSetContetnViewListener<T> onSetContetnViewListener;
     @Getter
     protected boolean eidtStatus = false;
+    @Setter
+    protected int space;
     public CardView(Context context) {
         super (context);
     }
+
     protected View init(List<T> tList,int resource,List<Integer> resources,int spanCount){
         root = LayoutInflater.from(getContext ()).inflate(R.layout.layout_card, this, true);
         typeLayout = findViewById (R.id.card_resources_typeLayout);
@@ -62,7 +66,7 @@ public class CardView<T> extends LinearLayout {
     }
     private void initGridLayout(int spanCount){
         RecyclerView recyclerView = findViewById (R.id.card_resources_countView);
-        recyclerView.addItemDecoration (new GridLayoutItemDecoration (10,spanCount));
+        recyclerView.addItemDecoration (new GridLayoutItemDecoration (getContext (),spanCount,space));
         GridLayoutManager gridLayoutManager = new GridLayoutManager (getContext (),spanCount,GridLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager (gridLayoutManager);
         recyclerView.setAdapter (cardContentAdapter);
