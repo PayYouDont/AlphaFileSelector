@@ -7,4 +7,5 @@
     <color name="card_text_black">#333333</color>
     <color name="card_mask_color_false">#00000000</color>
     <color name="card_mask_color_true">#57000000</color>
+    <color name="background_color">#FAFAFA</color>
 </resources>

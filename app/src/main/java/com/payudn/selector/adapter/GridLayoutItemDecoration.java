@@ -35,7 +35,6 @@ public class GridLayoutItemDecoration extends RecyclerView.ItemDecoration {
     }
     @Override
     public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-        System.out.println ("leftMargin="+((ViewGroup.MarginLayoutParams)(parent.getChildAt (0).getLayoutParams ())).leftMargin);
         super.onDraw (c, parent, state);
     }
 

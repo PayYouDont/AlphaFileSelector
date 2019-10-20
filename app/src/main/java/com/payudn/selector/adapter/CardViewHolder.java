@@ -20,4 +20,5 @@ public class CardViewHolder extends RecyclerView.ViewHolder{
             views.add (view);
         });
     }
+
 }

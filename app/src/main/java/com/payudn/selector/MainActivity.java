@@ -2,36 +2,80 @@ package com.payudn.selector;
 
 import android.Manifest;
 import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+import com.payudn.selector.ui.CollectFragment;
+import com.payudn.selector.ui.DocumentFragment;
+import com.payudn.selector.ui.MoreFragment;
+import com.payudn.selector.ui.MusicFragment;
+import com.payudn.selector.ui.PhoneFragment;
+import com.payudn.selector.ui.PictureFragment;
+import com.payudn.selector.ui.RecentFragment;
+import com.payudn.selector.ui.VideoFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import ru.alexbykov.nopermission.PermissionHelper;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
     private PermissionHelper permissionHelper;
     private TabLayout mTabLayout;
-    private String [] tabTexts = {"手机","最近","视频","图片","音乐","收藏","更多"};
+    public static SearchView searchView;
+    ViewPager viewPager;
+    private String [] tabTexts = {"手机","最近","文档","视频","图片","音乐","收藏","更多"};
+    private List<Fragment> fragmentList = new ArrayList<> ();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_main);
+        searchView = findViewById (R.id.query_view);
+        searchView.setOnClickListener (v -> {
+            System.out.println ("搜索操作");
+        });
         mTabLayout = findViewById(R.id.tab_layout);
         for(int i=0;i<tabTexts.length;i++){
-            mTabLayout.addTab(mTabLayout.newTab().setText(tabTexts[i]));
+            TabLayout.Tab tab = mTabLayout.newTab();
+            tab.setText(tabTexts[i]);
+            mTabLayout.addTab(tab);
         }
+        fragmentList.add (PhoneFragment.newInstance ());
+        fragmentList.add (RecentFragment.newInstance ());
+        fragmentList.add (DocumentFragment.newInstance ());
+        fragmentList.add (VideoFragment.newInstance ());
+        fragmentList.add (PictureFragment.newInstance ());
+        fragmentList.add (MusicFragment.newInstance ());
+        fragmentList.add (CollectFragment.newInstance ());
+        fragmentList.add (MoreFragment.newInstance ());
+        viewPager = findViewById (R.id.view_pager);
+        viewPager.setAdapter (new FragmentPagerAdapter (getSupportFragmentManager (),FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+            @NonNull
+            @Override
+            public Fragment getItem(int position) {
+                return fragmentList.get (position);
+            }
+
+            @Override
+            public int getCount() {
+                return fragmentList.size ();
+            }
+            @Override
+            public CharSequence getPageTitle(int position) {
+                return tabTexts[position];
+            }
+        });
+        viewPager.setOffscreenPageLimit(2);
+        mTabLayout.setupWithViewPager (viewPager);
         mTabLayout.getTabAt (1).select ();
         mTabLayout.addOnTabSelectedListener (this);
         permissionHelper = new PermissionHelper(this);
@@ -72,6 +116,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         super.onActivityResult (requestCode, resultCode, data);
     }
     private void getPermission() {
+        // Manifest.permission.READ_MEDIA_IMAGES,
+        //                Manifest.permission.READ_MEDIA_VIDEO,
+        //                Manifest.permission.READ_MEDIA_AUDIO,
         permissionHelper.check(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.CAMERA,

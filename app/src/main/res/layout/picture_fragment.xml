@@ -3,11 +3,12 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.RecentFragment">
-
-    <TextView
+        tools:context=".ui.PictureFragment">
+    <GridLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Hello" />
-
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/picture_recycler"/>
+    </GridLayout>
 </FrameLayout>

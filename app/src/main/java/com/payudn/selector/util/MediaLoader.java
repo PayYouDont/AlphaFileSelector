@@ -17,9 +17,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import lombok.Setter;
+
 public class MediaLoader {
     public static Queue<MediaBean> mediaBeanQueue = new LinkedList<> ();
     private Context context;
+    @Setter
+    private onLoadDataListener onLoadDataListener;
     private static final String[] projImage = {MediaStore.Images.Media._ID, // id
             MediaStore.Images.Media.DATA,// 文件路径
             MediaStore.Images.Media.SIZE,//文件大小
@@ -42,7 +46,7 @@ public class MediaLoader {
         this.context = context;
     }
 
-    public MediaBean getMediaByUri(Uri uri, ContentResolver contentResolver){
+    public static MediaBean getMediaByUri(Uri uri, ContentResolver contentResolver){
         if (!uri.toString().contains("image")) {
             return null;
         }
@@ -92,15 +96,16 @@ public class MediaLoader {
      */
     public void getAllPhotoInfo() {
         new Thread (() -> {
-            //List<MediaBean> mediaBeanList = new ArrayList<> ();
-            //Map<String,List<MediaBean>> allPhotosTemp = new HashMap<>();//所有照片
             Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
             Cursor mCursor = context.getContentResolver().query(mImageUri,projImage, MediaStore.Images.Media.MIME_TYPE + "=? or " + MediaStore.Images.Media.MIME_TYPE + "=?",
                     new String[]{"image/jpeg", "image/png"}, MediaStore.Images.Media.DATE_MODIFIED+" desc");
             if(mCursor!=null){
                 while (mCursor.moveToNext()) {
-                    mediaBeanQueue.offer (parseToMediaBean (mCursor));
+                    MediaBean mediaBean = parseToMediaBean (mCursor);
+                    mediaBeanQueue.offer (mediaBean);
+                    if(onLoadDataListener!=null){
+                        onLoadDataListener.loadData (mediaBean);
+                    }
                 }
                 mCursor.close();
             }}).start();
@@ -171,5 +176,7 @@ public class MediaLoader {
                 });*/
         }).start();
     }
-
+    public interface onLoadDataListener{
+        public void loadData(MediaBean mediaBean);
+    }
 }

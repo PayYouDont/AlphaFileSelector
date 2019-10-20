@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class MediaBean {
     private long id;
+    private String uri;
     //图片
     private Type type;
     private String path;

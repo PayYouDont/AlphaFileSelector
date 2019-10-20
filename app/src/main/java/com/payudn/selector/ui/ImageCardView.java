@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -18,11 +17,14 @@ import com.payudn.selector.util.FileUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+
 public class ImageCardView extends CardView<MediaBean>{
+    @Getter
     private List<MediaBean> imageBeanList;
     private List<Integer> resources;
     private int resource;
-    int coverMargin;
+    private int coverMargin;
     public ImageCardView(Context context, List<MediaBean> imageBeanList) {
         super (context);
         this.imageBeanList = imageBeanList;
@@ -39,12 +41,12 @@ public class ImageCardView extends CardView<MediaBean>{
             setEidt();
             return true;
         });
-        setOnSetContetnViewListener ((views, imageBean) -> views.forEach (v -> {
+        setOnSetContetnViewListener ((viewHolder, imageBean) -> viewHolder.views.forEach (v -> {
                 if(v.getId () == R.id.image_content){
                     ImageView imageView = (ImageView )v;
                     Point p = new Point ();
-                    getRoot ().getDisplay ().getSize (p);
-                    int width = (p.x-3*space-2)/4;
+                    root.getDisplay ().getSize (p);
+                    int width = p.x/4;
                     Bitmap bitmap = FileUtil.parseToBitmap (imageBean,width,width,25,1);
                     imageView.setImageBitmap (bitmap);
                 }else if(v.getId () == R.id.image_check_btn){
@@ -61,7 +63,7 @@ public class ImageCardView extends CardView<MediaBean>{
     }
     public void setEidt(){
         if(isEidtStatus ()){
-            List<View> childViews = getAllChildViews (this);
+            List<View> childViews = getAllChildViews (root);
             childViews.forEach (v -> {
                 if(v instanceof CheckBox){
                     CheckBox box = (CheckBox) v;
@@ -91,13 +93,12 @@ public class ImageCardView extends CardView<MediaBean>{
             MarginLayoutParams params = (MarginLayoutParams) relativeLayout.getLayoutParams ();
             Point imageSize = new Point ();
             ImageView imageView = getCardContentAdapter ().getRoot ().findViewById (R.id.image_content);
-
             if(imageView!=null){
                 imageSize.x = imageView.getWidth ();
-                imageSize.y = imageView.getHeight ()- coverMargin;
+                imageSize.y = imageView.getHeight ()- 2*coverMargin;
                 params.width = imageSize.x;
                 params.height = imageSize.y;
-                params.topMargin = coverMargin/2;
+                params.topMargin = coverMargin;
                 relativeLayout.setLayoutParams (params);
             }
         }

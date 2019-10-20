@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class CardContentAdapter<T> extends RecyclerView.Adapter{
+    @Getter
     private List<T> tList;
     private int resource;
     @Getter
@@ -25,7 +26,7 @@ public class CardContentAdapter<T> extends RecyclerView.Adapter{
     private View.OnLongClickListener onLongClickListener;
     @Setter
     private OnSetContetnViewListener<T> onSetContetnViewListener;
-    CardViewHolder holder;
+    private CardViewHolder holder;
 
     public CardContentAdapter(List<T> tList, int resource, List<Integer> resources) {
         this.tList = tList;
@@ -58,14 +59,12 @@ public class CardContentAdapter<T> extends RecyclerView.Adapter{
         return holder;
     }
 
-
-
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         T t = tList.get (position);
         CardViewHolder viewHolder = (CardViewHolder) holder;
         if(onSetContetnViewListener!=null){
-            onSetContetnViewListener.setViews (viewHolder.views,t);
+            onSetContetnViewListener.setViews (viewHolder,t);
         }
     }
 
@@ -74,7 +73,7 @@ public class CardContentAdapter<T> extends RecyclerView.Adapter{
         return tList.size ();
     }
     public interface OnSetContetnViewListener<T>{
-        void setViews(List<View> views,T t);
+        void setViews(CardViewHolder holder,T t);
     }
     public interface OnSelectItemListener{
         void onSelect(int position);

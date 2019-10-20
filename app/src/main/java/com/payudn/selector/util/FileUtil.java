@@ -16,8 +16,9 @@ import com.payudn.selector.entity.MediaBean;
 import java.io.FileInputStream;
 
 public class FileUtil {
-    public static Bitmap parseToBitmap(MediaBean imageBean, int outWidth, int outHeight,int radius, int boarder){
+    public static Bitmap parseToBitmap(MediaBean imageBean, int outWidth, int outHeight, int radius, int boarder){
         try {
+
             FileInputStream in = new FileInputStream(imageBean.getPath ());
             Bitmap bitmap = BitmapFactory.decodeStream(in);
             int width = bitmap.getWidth();
