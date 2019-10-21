@@ -7,14 +7,17 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.payudn.selector.R;
 import com.payudn.selector.entity.MediaBean;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import lombok.Setter;
@@ -24,7 +27,8 @@ public class MediaLoader {
     private Context context;
     @Setter
     private onLoadDataListener onLoadDataListener;
-    private static final String[] projImage = {MediaStore.Images.Media._ID, // id
+    private static final String[] projImage = {
+            MediaStore.Images.Media._ID, // id
             MediaStore.Images.Media.DATA,// 文件路径
             MediaStore.Images.Media.SIZE,//文件大小
             MediaStore.Images.Media.DISPLAY_NAME,// 文件名
@@ -32,6 +36,13 @@ public class MediaLoader {
             MediaStore.Images.Media.WIDTH,
             MediaStore.Images.Media.HEIGHT,
             MediaStore.Images.Media.DATE_MODIFIED};// 最后一次修改时间
+    private static final String[] projThumbnailsImage = {
+            MediaStore.Images.Thumbnails._ID, // id
+            MediaStore.Images.Thumbnails.DATA,// 文件路径
+            MediaStore.Images.Thumbnails.IMAGE_ID,//图片id
+            MediaStore.Images.Thumbnails.KIND, //种类
+            MediaStore.Images.Thumbnails.WIDTH,
+            MediaStore.Images.Thumbnails.HEIGHT};
     private static final String[] projVideo = {
             MediaStore.Video.Thumbnails._ID,
             MediaStore.Video.Thumbnails.DATA,
@@ -76,6 +87,41 @@ public class MediaLoader {
         mediaBean.setWidth (width);
         mediaBean.setHeight (height);
         return mediaBean;
+
+    }
+    public static Integer getPictureCount(Context context,int startDay) {
+        Date now = new Date ();
+        Date dayAgo = new Date (now.getTime ()-startDay*24*60*60*1000);
+        return getPictureCount (context,dayAgo.getTime (),now.getTime ());
+    }
+    public static Integer getPictureCount(Context context,Long startTime,Long endTime) {
+        String start = null;
+        if(startTime!=null){
+            start = startTime.toString ().substring (0,startTime.toString ().length ()-3);
+        }
+        String end = null;
+        if(endTime!=null){
+            end = endTime.toString ().substring (0,endTime.toString ().length ()-3);
+        }
+        Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        String selection = "";
+        String selectionArgs = "";
+        if(start!=null){
+            selection += "(("+MediaStore.Images.Media.DATE_ADDED + ">? or ";
+            selectionArgs += start+",";
+            selection += MediaStore.Images.Media.DATE_MODIFIED + ">? ) and (";
+            selectionArgs += start+",";
+        }
+        if(end!=null){
+            selection += MediaStore.Images.Media.DATE_ADDED + "<? or ";
+            selectionArgs += end+",";
+            selection +=  MediaStore.Images.Media.DATE_MODIFIED + "<? )) and ";
+            selectionArgs += end+",";
+        }
+        selection += MediaStore.Images.Media.MIME_TYPE + " like ?";
+        selectionArgs += "image%";
+        Cursor mCursor = context.getContentResolver().query(mImageUri,projImage,selection,selectionArgs.split (","), MediaStore.Images.Media.DATE_MODIFIED+" desc");
+        return mCursor.getCount ();
     }
     public static List<MediaBean> getMediaBeans(Context context) {
         List<MediaBean> mediaBeanList = new ArrayList<> ();
@@ -109,6 +155,24 @@ public class MediaLoader {
                 }
                 mCursor.close();
             }}).start();
+    }
+    public Map<Date,Integer> getPhotoCountOrderByDay(List<Date> dateList) {
+        Map<Date,Integer> dateMap = new LinkedHashMap<> ();
+        int sum = 0;
+        int datdCount = getPictureCount (context,dateList.size ());
+        for(int i=0;i<dateList.size ()-1;i++){
+            Date startDate = dateList.get (i+1);
+            Date endDate = dateList.get (i);
+            int count = getPictureCount (context,startDate.getTime (),endDate.getTime ());
+            if(count>0){
+                sum += count;
+                dateMap.put (startDate,count);
+            }
+            if(sum==datdCount){
+                break;
+            }
+        }
+        return dateMap;
     }
     /**
      * 获取手机中所有视频的信息
@@ -177,6 +241,6 @@ public class MediaLoader {
         }).start();
     }
     public interface onLoadDataListener{
-        public void loadData(MediaBean mediaBean);
+        void loadData(MediaBean mediaBean);
     }
 }

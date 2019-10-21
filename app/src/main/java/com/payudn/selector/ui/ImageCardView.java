@@ -47,7 +47,7 @@ public class ImageCardView extends CardView<MediaBean>{
                     Point p = new Point ();
                     root.getDisplay ().getSize (p);
                     int width = p.x/4;
-                    Bitmap bitmap = FileUtil.parseToBitmap (imageBean,width,width,25,1);
+                    Bitmap bitmap = FileUtil.parseToBitmap (root.getContext (),imageBean,width,width,25,1);
                     imageView.setImageBitmap (bitmap);
                 }else if(v.getId () == R.id.image_check_btn){
                     CheckBox checkBox = (CheckBox)v;

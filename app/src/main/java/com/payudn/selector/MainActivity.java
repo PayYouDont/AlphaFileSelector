@@ -18,7 +18,7 @@ import com.payudn.selector.ui.CollectFragment;
 import com.payudn.selector.ui.DocumentFragment;
 import com.payudn.selector.ui.MoreFragment;
 import com.payudn.selector.ui.MusicFragment;
-import com.payudn.selector.ui.PhoneFragment;
+import com.payudn.selector.ui.phone.PhoneFragment;
 import com.payudn.selector.ui.PictureFragment;
 import com.payudn.selector.ui.RecentFragment;
 import com.payudn.selector.ui.VideoFragment;
@@ -76,19 +76,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         });
         viewPager.setOffscreenPageLimit(2);
         mTabLayout.setupWithViewPager (viewPager);
-        mTabLayout.getTabAt (1).select ();
+        mTabLayout.getTabAt (0).select ();
         mTabLayout.addOnTabSelectedListener (this);
         permissionHelper = new PermissionHelper(this);
         getPermission();
-        /*Button button = findViewById (R.id.select_btn);
-        List<MediaBean> imageBeanList = MediaLoader.getMediaBeans (this);
-        button.setOnClickListener (view -> {
-            ImageCardView imageCardView = new ImageCardView (this,imageBeanList);
-            imageCardView.setOnSelectItemListener (position -> {
-                System.out.println ("选择了这image"+imageBeanList.get (position));
-            });
-            setContentView (imageCardView.create ());
-        });*/
     }
 
     @Override

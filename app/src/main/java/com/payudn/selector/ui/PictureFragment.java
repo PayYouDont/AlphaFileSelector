@@ -52,13 +52,17 @@ public class PictureFragment extends Fragment {
         return root;
     }
     private void initData(){
-        mViewModel.getMediaBeanData ().observe (this,mediaBeans -> {
-            ImageCardView imageCard = new ImageCardView (getContext (),mediaBeans);
-            imageCard.setOnSelectItemListener (position -> {
-                System.out.println ("选择了"+imageCard.getImageBeanList ().get (position));
-            });
+        mViewModel.getMediaBeanData ().observe (this,viewDataMap -> {
             List<ImageCardView> imageCardViews = new ArrayList<> ();
-            imageCardViews.add (imageCard);
+            viewDataMap.forEach ((date, integer) -> {
+                List<MediaBean> mediaBeans = new ArrayList<> ();
+                for(int i=0;i<integer;i++){
+                    MediaBean mediaBean = new MediaBean (MediaBean.Type.Image,"",0,"test");
+                    mediaBeans.add (mediaBean);
+                }
+                ImageCardView imageCard = new ImageCardView (getContext (),mediaBeans);
+                imageCardViews.add (imageCard);
+            });
             cardContentAdapter = new CardContentAdapter (imageCardViews,R.layout.layout_card,CardView.getCardResources ());
             cardContentAdapter.setOnSetContetnViewListener ((holder, imageCardView) -> holder.views.forEach (view -> {
                 if(view.getId ()==R.id.card_resources_recyclerView){
