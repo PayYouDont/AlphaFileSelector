@@ -1,5 +1,8 @@
 package com.payudn.selector.util;
 
+import android.util.Log;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -28,5 +31,13 @@ public class DateUtil {
     }
     public static List<Date> getDays(Date beginDate){
         return findDates (beginDate,new Date());
+    }
+    public static String formatDate(Date date,String format){
+        try {
+            return new SimpleDateFormat (format).format (date);
+        }catch (Exception e){
+            Log.e ("DateUtil", "formatDate: 解析日期错误", e);
+        }
+        return null;
     }
 }

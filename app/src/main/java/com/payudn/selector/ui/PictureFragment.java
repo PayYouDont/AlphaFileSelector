@@ -11,14 +11,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
-import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.payudn.selector.R;
 import com.payudn.selector.adapter.CardContentAdapter;
-import com.payudn.selector.entity.MediaBean;
+import com.payudn.selector.entity.FileBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,10 +36,10 @@ public class PictureFragment extends Fragment {
         mViewModel.setContext (getContext ());
         Handler handler = new Handler (msg -> {
             if(msg.what==0){
-                MediaBean mediaBean =  mViewModel.getImageBeanList ().get (mViewModel.getImageBeanList ().size ()-1);
+                FileBean mediaBean =  mViewModel.getImageBeanList ().get (mViewModel.getImageBeanList ().size ()-1);
                 if(cardContentAdapter!=null){
                     List<ImageCardView> imageCardViews = cardContentAdapter.getTList ();
-                    CardContentAdapter<MediaBean> adapter = imageCardViews.get (imageCardViews.size ()-1).getCardContentAdapter ();
+                    CardContentAdapter<FileBean> adapter = imageCardViews.get (imageCardViews.size ()-1).getCardContentAdapter ();
                     adapter.getTList ().add (mediaBean);
                     adapter.notifyDataSetChanged ();
                 }
@@ -55,9 +54,9 @@ public class PictureFragment extends Fragment {
         mViewModel.getMediaBeanData ().observe (this,viewDataMap -> {
             List<ImageCardView> imageCardViews = new ArrayList<> ();
             viewDataMap.forEach ((date, integer) -> {
-                List<MediaBean> mediaBeans = new ArrayList<> ();
+                List<FileBean> mediaBeans = new ArrayList<> ();
                 for(int i=0;i<integer;i++){
-                    MediaBean mediaBean = new MediaBean (MediaBean.Type.Image,"",0,"test");
+                    FileBean mediaBean = new FileBean (FileBean.Type.Image,"/storage/emulated/0/Download/QQ截图20191017205341.png",0,"QQ截图20191017205341.png");
                     mediaBeans.add (mediaBean);
                 }
                 ImageCardView imageCard = new ImageCardView (getContext (),mediaBeans);

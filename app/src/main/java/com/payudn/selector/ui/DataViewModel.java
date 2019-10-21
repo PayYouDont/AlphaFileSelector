@@ -9,9 +9,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.payudn.selector.entity.MediaBean;
+import com.payudn.selector.entity.FileBean;
 import com.payudn.selector.util.DateUtil;
-import com.payudn.selector.util.FileUtil;
 import com.payudn.selector.util.MediaLoader;
 
 import java.text.SimpleDateFormat;
@@ -26,7 +25,7 @@ import lombok.Setter;
 public class DataViewModel extends ViewModel {
     private MutableLiveData<Map<Date,Integer>> vieWData;
     @Getter
-    public List<MediaBean> imageBeanList = new ArrayList<> ();
+    public List<FileBean> imageBeanList = new ArrayList<> ();
     @Setter
     private Context context;
     @Setter
@@ -52,7 +51,7 @@ public class DataViewModel extends ViewModel {
         }
         return vieWData;
     }
-    private void refreshData(MediaBean mediaBean){
+    private void refreshData(FileBean mediaBean){
         imageBeanList.add (mediaBean);
         Message message = new Message ();
         message.what = 1;

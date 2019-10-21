@@ -7,8 +7,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.payudn.selector.R;
-import com.payudn.selector.entity.MediaBean;
+import com.payudn.selector.entity.FileBean;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ import java.util.Queue;
 import lombok.Setter;
 
 public class MediaLoader {
-    public static Queue<MediaBean> mediaBeanQueue = new LinkedList<> ();
+    public static Queue<FileBean> mediaBeanQueue = new LinkedList<> ();
     private Context context;
     @Setter
     private onLoadDataListener onLoadDataListener;
@@ -57,7 +56,7 @@ public class MediaLoader {
         this.context = context;
     }
 
-    public static MediaBean getMediaByUri(Uri uri, ContentResolver contentResolver){
+    public static FileBean getMediaByUri(Uri uri, ContentResolver contentResolver){
         if (!uri.toString().contains("image")) {
             return null;
         }
@@ -68,7 +67,7 @@ public class MediaLoader {
         mCursor.moveToLast();    // 倒序读取
         return parseToMediaBean (mCursor);
     }
-    private static MediaBean parseToMediaBean(Cursor mCursor){
+    private static FileBean parseToMediaBean(Cursor mCursor){
         int mediaDataIndex = mCursor.getColumnIndex(MediaStore.Images.Media.DATA);
         // 获取图片的路径
         if(mediaDataIndex==-1){
@@ -81,7 +80,7 @@ public class MediaLoader {
         Date updateDate = new Date (mCursor.getLong (mCursor.getColumnIndex (MediaStore.Images.Media.DATE_MODIFIED)));
         int width =  mCursor.getInt(mCursor.getColumnIndex(MediaStore.Images.Media.WIDTH));
         int height =  mCursor.getInt(mCursor.getColumnIndex(MediaStore.Images.Media.HEIGHT));
-        MediaBean mediaBean = new MediaBean(MediaBean.Type.Image,path,size,displayName);
+        FileBean mediaBean = new FileBean (FileBean.Type.Image,path,size,displayName);
         mediaBean.setCreateTime (createDate);
         mediaBean.setUpdateTime (updateDate);
         mediaBean.setWidth (width);
@@ -123,8 +122,8 @@ public class MediaLoader {
         Cursor mCursor = context.getContentResolver().query(mImageUri,projImage,selection,selectionArgs.split (","), MediaStore.Images.Media.DATE_MODIFIED+" desc");
         return mCursor.getCount ();
     }
-    public static List<MediaBean> getMediaBeans(Context context) {
-        List<MediaBean> mediaBeanList = new ArrayList<> ();
+    public static List<FileBean> getMediaBeans(Context context) {
+        List<FileBean> mediaBeanList = new ArrayList<> ();
         Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
         Cursor mCursor = context.getContentResolver().query(mImageUri,projImage, MediaStore.Images.Media.MIME_TYPE + "=? or " + MediaStore.Images.Media.MIME_TYPE + "=?",
@@ -147,7 +146,7 @@ public class MediaLoader {
                     new String[]{"image/jpeg", "image/png"}, MediaStore.Images.Media.DATE_MODIFIED+" desc");
             if(mCursor!=null){
                 while (mCursor.moveToNext()) {
-                    MediaBean mediaBean = parseToMediaBean (mCursor);
+                    FileBean mediaBean = parseToMediaBean (mCursor);
                     mediaBeanQueue.offer (mediaBean);
                     if(onLoadDataListener!=null){
                         onLoadDataListener.loadData (mediaBean);
@@ -179,7 +178,7 @@ public class MediaLoader {
      */
     private void getAllVideoInfos(){
         new Thread (() -> {
-            HashMap<String, List<MediaBean>> allPhotosTemp = new HashMap<> ();//所有照片
+            HashMap<String, List<FileBean>> allPhotosTemp = new HashMap<> ();//所有照片
             Uri mImageUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 
             Cursor mCursor = context.getContentResolver().query(mImageUri,
@@ -217,14 +216,14 @@ public class MediaLoader {
                     cursor.close();
                     // 获取该视频的父路径名
                     String dirPath = new File (path).getParentFile().getAbsolutePath();
-                    MediaBean mediaBean = new MediaBean (MediaBean.Type.Video,path,size,displayName,thumbPath,duration);
+                    FileBean mediaBean = new FileBean (FileBean.Type.Video,path,size,displayName,thumbPath,duration);
                     //存储对应关系
                     if (allPhotosTemp.containsKey(dirPath)) {
-                        List<MediaBean> data = allPhotosTemp.get(dirPath);
+                        List<FileBean> data = allPhotosTemp.get(dirPath);
                         data.add(mediaBean);
                         continue;
                     } else {
-                        List<MediaBean> data = new ArrayList<> ();
+                        List<FileBean> data = new ArrayList<> ();
                         data.add(mediaBean);
                         allPhotosTemp.put(dirPath,data);
                     }
@@ -241,6 +240,6 @@ public class MediaLoader {
         }).start();
     }
     public interface onLoadDataListener{
-        void loadData(MediaBean mediaBean);
+        void loadData(FileBean mediaBean);
     }
 }

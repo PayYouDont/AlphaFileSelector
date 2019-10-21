@@ -28,7 +28,7 @@ public class RecentFragment extends Fragment {
         mViewModel = ViewModelProviders.of (this).get (DataViewModel.class);
         mViewModel.setContext (getContext ());
         FileUtil.getRootFile (getContext (),cursor -> {
-            System.out.println (cursor.getString (cursor.getColumnIndex (MediaStore.Files.FileColumns.DATA)));
+            //System.out.println (cursor.getString (cursor.getColumnIndex (MediaStore.Files.FileColumns.DATA)));
         });
         return root;
     }

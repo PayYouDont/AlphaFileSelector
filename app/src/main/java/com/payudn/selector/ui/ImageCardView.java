@@ -11,7 +11,7 @@ import android.widget.RelativeLayout;
 
 import com.payudn.selector.R;
 import com.payudn.selector.adapter.GridLayoutItemDecoration;
-import com.payudn.selector.entity.MediaBean;
+import com.payudn.selector.entity.FileBean;
 import com.payudn.selector.util.FileUtil;
 
 import java.util.ArrayList;
@@ -19,13 +19,13 @@ import java.util.List;
 
 import lombok.Getter;
 
-public class ImageCardView extends CardView<MediaBean>{
+public class ImageCardView extends CardView<FileBean>{
     @Getter
-    private List<MediaBean> imageBeanList;
+    private List<FileBean> imageBeanList;
     private List<Integer> resources;
     private int resource;
     private int coverMargin;
-    public ImageCardView(Context context, List<MediaBean> imageBeanList) {
+    public ImageCardView(Context context, List<FileBean> imageBeanList) {
         super (context);
         this.imageBeanList = imageBeanList;
     }
@@ -47,7 +47,7 @@ public class ImageCardView extends CardView<MediaBean>{
                     Point p = new Point ();
                     root.getDisplay ().getSize (p);
                     int width = p.x/4;
-                    Bitmap bitmap = FileUtil.parseToBitmap (root.getContext (),imageBean,width,width,25,1);
+                    Bitmap bitmap = FileUtil.parseToBitmap (root.getContext (),imageBean.getPath (),width,width,25,1);
                     imageView.setImageBitmap (bitmap);
                 }else if(v.getId () == R.id.image_check_btn){
                     CheckBox checkBox = (CheckBox)v;

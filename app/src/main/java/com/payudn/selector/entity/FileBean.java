@@ -5,8 +5,9 @@ import java.util.Date;
 import lombok.Data;
 
 @Data
-public class MediaBean {
-    private long id;
+public class FileBean {
+    private Integer parentId;
+    private int id;
     private String uri;
     //图片
     private Type type;
@@ -24,14 +25,14 @@ public class MediaBean {
     //视频
     private String thumbPath;
     private int duration;
-    public MediaBean(Type type, String path, int size, String displayName) {
+    public FileBean(Type type, String path, int size, String displayName) {
         this.type = type;
         this.path = path;
         this.size = size;
         this.displayName = displayName;
     }
 
-    public MediaBean(Type type, String path, long size, String displayName, String thumbPath, int duration) {
+    public FileBean(Type type, String path, long size, String displayName, String thumbPath, int duration) {
         this.type = type;
         this.path = path;
         this.size = size;
@@ -40,6 +41,6 @@ public class MediaBean {
         this.duration = duration;
     }
     public enum Type {
-        Image,Video
+        Image,Video,File,txt,
     }
 }

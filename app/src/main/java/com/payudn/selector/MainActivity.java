@@ -3,6 +3,7 @@ package com.payudn.selector;
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -119,5 +120,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         ).onSuccess(() -> {})
                 .onDenied(() -> Toast.makeText (this,"权限被拒绝！将无法获取到WiFi信息!",Toast.LENGTH_SHORT).show ())
                 .onNeverAskAgain(() -> Toast.makeText (this,"权限被拒绝！将无法获取到WiFi信息,下次不会再询问了！",Toast.LENGTH_SHORT).show ()).run();
+    }
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if(mTabLayout.getSelectedTabPosition ()==0){
+                PhoneFragment fragment = (PhoneFragment) fragmentList.get (0);
+                fragment.refreshAdapterByParentId ();
+            }
+        }
+        return true;
     }
 }
