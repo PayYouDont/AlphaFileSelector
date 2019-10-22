@@ -10,11 +10,13 @@ import com.payudn.selector.util.FileUtil;
 
 import java.util.List;
 
+import lombok.Getter;
 import lombok.Setter;
 
 public class PhoneModel extends ViewModel {
     @Setter
     private Context context;
+    @Getter
     private MutableLiveData<List<FileBean>> fileData;
     public PhoneModel() {
         fileData = new MutableLiveData<> ();

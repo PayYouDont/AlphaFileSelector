@@ -15,6 +15,7 @@ import lombok.Setter;
 public class CardContentAdapter<T> extends RecyclerView.Adapter{
     @Getter
     private List<T> tList;
+    @Setter
     private int resource;
     @Getter
     private View root;

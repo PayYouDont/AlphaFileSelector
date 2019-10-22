@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.payudn.selector.R;
+import com.payudn.selector.ui.picture.DataViewModel;
 
 public class CollectFragment extends Fragment {
 

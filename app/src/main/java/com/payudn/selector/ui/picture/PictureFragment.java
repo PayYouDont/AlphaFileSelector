@@ -1,4 +1,4 @@
-package com.payudn.selector.ui;
+package com.payudn.selector.ui.picture;
 
 import androidx.lifecycle.ViewModelProviders;
 
@@ -18,6 +18,8 @@ import android.view.ViewGroup;
 import com.payudn.selector.R;
 import com.payudn.selector.adapter.CardContentAdapter;
 import com.payudn.selector.entity.FileBean;
+import com.payudn.selector.ui.CardView;
+import com.payudn.selector.ui.ImageCardView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +64,7 @@ public class PictureFragment extends Fragment {
                 ImageCardView imageCard = new ImageCardView (getContext (),mediaBeans);
                 imageCardViews.add (imageCard);
             });
-            cardContentAdapter = new CardContentAdapter (imageCardViews,R.layout.layout_card,CardView.getCardResources ());
+            cardContentAdapter = new CardContentAdapter (imageCardViews,R.layout.layout_card, CardView.getCardResources ());
             cardContentAdapter.setOnSetContetnViewListener ((holder, imageCardView) -> holder.views.forEach (view -> {
                 if(view.getId ()==R.id.card_resources_recyclerView){
                     RecyclerView recyclerView = (RecyclerView)view;

@@ -20,9 +20,10 @@ import com.payudn.selector.ui.DocumentFragment;
 import com.payudn.selector.ui.MoreFragment;
 import com.payudn.selector.ui.MusicFragment;
 import com.payudn.selector.ui.phone.PhoneFragment;
-import com.payudn.selector.ui.PictureFragment;
+import com.payudn.selector.ui.picture.PictureFragment;
 import com.payudn.selector.ui.RecentFragment;
 import com.payudn.selector.ui.VideoFragment;
+import com.payudn.selector.util.FileUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,9 +109,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         super.onActivityResult (requestCode, resultCode, data);
     }
     private void getPermission() {
-        // Manifest.permission.READ_MEDIA_IMAGES,
-        //                Manifest.permission.READ_MEDIA_VIDEO,
-        //                Manifest.permission.READ_MEDIA_AUDIO,
         permissionHelper.check(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.CAMERA,
@@ -124,8 +122,17 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if(mTabLayout.getSelectedTabPosition ()==0){
+
                 PhoneFragment fragment = (PhoneFragment) fragmentList.get (0);
-                fragment.refreshAdapterByParentId ();
+                if(fragment.isEidtStatus ()){
+                    fragment.backByEditStatus ();
+                    return true;
+                }
+                int parentId = fragment.getParentId ();
+                if(parentId>0){
+                    parentId = FileUtil.findById (this,parentId).getParentId ();
+                }
+                fragment.refreshAdapterByParentId (parentId);
             }
         }
         return true;

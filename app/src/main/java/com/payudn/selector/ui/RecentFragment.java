@@ -1,7 +1,6 @@
 package com.payudn.selector.ui;
 
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.payudn.selector.R;
+import com.payudn.selector.ui.picture.DataViewModel;
 import com.payudn.selector.util.FileUtil;
 
 public class RecentFragment extends Fragment {

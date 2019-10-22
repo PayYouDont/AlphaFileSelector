@@ -1,4 +1,4 @@
-package com.payudn.selector.ui;
+package com.payudn.selector.ui.picture;
 
 import android.content.Context;
 import android.os.Handler;

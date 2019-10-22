@@ -105,7 +105,7 @@ public class FileUtil {
                 projection,
                 selection,
                 selectionArgs,
-                MediaStore.Files.FileColumns.DATA);
+                MediaStore.Files.FileColumns.MIME_TYPE + " asc , "+ MediaStore.Files.FileColumns.DATA + " asc");
         while (cursor.moveToNext ()){
             FileBean fileBean = parseToMediaBean (cursor);
             return fileBean;
@@ -139,8 +139,6 @@ public class FileUtil {
         String path = mCursor.getString (mCursor.getColumnIndex (MediaStore.Files.FileColumns.DATA));
         int size = mCursor.getInt(mCursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE))/1024;
         String displayName = mCursor.getString(mCursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME));
-        Date createDate = new Date (mCursor.getLong (mCursor.getColumnIndex (MediaStore.Files.FileColumns.DATE_ADDED)));
-        Date updateDate = new Date (mCursor.getLong (mCursor.getColumnIndex (MediaStore.Files.FileColumns.DATE_MODIFIED)));
         int width =  mCursor.getInt(mCursor.getColumnIndex(MediaStore.Files.FileColumns.WIDTH));
         int height =  mCursor.getInt(mCursor.getColumnIndex(MediaStore.Files.FileColumns.HEIGHT));
         FileBean.Type beanType = null;
@@ -157,8 +155,14 @@ public class FileUtil {
         FileBean fileBean = new FileBean (beanType,path,size,displayName);
         fileBean.setId (id);
         fileBean.setParentId (parent);
-        fileBean.setCreateTime (createDate);
-        fileBean.setUpdateTime (updateDate);
+        if(mCursor.getColumnIndex (MediaStore.Files.FileColumns.DATE_ADDED)!=-1){
+            Date createDate = new Date (mCursor.getLong (mCursor.getColumnIndex (MediaStore.Files.FileColumns.DATE_ADDED))*1000);
+            fileBean.setCreateTime (createDate);
+        }
+        if(mCursor.getColumnIndex (MediaStore.Files.FileColumns.DATE_MODIFIED)!=-1){
+            Date updateDate = new Date (mCursor.getLong (mCursor.getColumnIndex (MediaStore.Files.FileColumns.DATE_MODIFIED))*1000);
+            fileBean.setUpdateTime (updateDate);
+        }
         fileBean.setWidth (width);
         fileBean.setHeight (height);
         return fileBean;
