@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.List;
 
 public class FileUtil {
-    private static final Uri EXTERNAL_STORAGE_URI_FILES = MediaStore.Files.getContentUri("external");
     public static Bitmap parseToBitmap(Context context,String filePath, int outWidth, int outHeight, int radius, int boarder){
         try {
             Bitmap bitmap;
@@ -78,6 +77,7 @@ public class FileUtil {
     public static List<FileBean> getRootFile(Context context,OnFileListener onFileListener){
         return getFileByParentId (context,0,onFileListener);
     }
+    private static final Uri EXTERNAL_STORAGE_URI_FILES = MediaStore.Files.getContentUri("external");
     public static List<FileBean> getFileByParentId(Context context,int parentId,OnFileListener onFileListener){
         List<FileBean> fileBeans = new ArrayList<> ();
         String selection = MediaStore.Files.FileColumns.PARENT + "= ?";

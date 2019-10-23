@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewManager;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -46,13 +47,18 @@ public class PhoneFragment extends Fragment {
     private View root;
     private ArrowLabelView filePath;
     @Getter
-    private int parentId = 0;
+    private int parentId;
     private RecyclerView recyclerView;
     private CardContentAdapter<FileBean> cardContentAdapter;
     private LinearLayout titleLayout;
     private ImageView viewModelImage;
+    //线性布局
+    public static final int LAYOUT_LINEAR = 0;
+    //网格布局
+    public static final int LAYOUT_GRID = 1;
     @Getter
     private boolean eidtStatus = false;
+    private int layoutType = 0;
     public static PhoneFragment newInstance() {
         return new PhoneFragment ();
     }
@@ -60,29 +66,14 @@ public class PhoneFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,@Nullable Bundle savedInstanceState) {
         root = inflater.inflate (R.layout.phone_fragment, container, false);
+        parentId = 0;
         titleLayout = root.findViewById (R.id.title_layout);
         filePath = root.findViewById (R.id.root_path);
         filePath.setLabelText ("内部存储设备");
         filePath.setLabelData (0);
-        filePath.setOnClickListener (v -> {
-            Integer parentId = Integer.valueOf (filePath.getLabelData ());
-            refreshAdapterByParentId (parentId);
-        });
+        filePath.setOnClickListener (v -> refreshAdapterByParentId (Integer.valueOf (filePath.getLabelData ())));
         viewModelImage = root.findViewById (R.id.view_model_image);
-        viewModelImage.setOnClickListener (v -> {
-            RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager ();
-            if (layoutManager instanceof GridLayoutManager){
-                cardContentAdapter.setOnSetContetnViewListener ((holder, fileBean) ->setLinearViewHolder (holder,fileBean));
-                recyclerView.setLayoutManager (new LinearLayoutManager (getContext (),LinearLayoutManager.VERTICAL,false));
-                viewModelImage.setImageResource (R.drawable.ic_view_model_grid);
-            }else{
-                cardContentAdapter.setOnSetContetnViewListener ((holder, fileBean) ->setGridViewHolder(holder,fileBean));
-                recyclerView.setLayoutManager (new GridLayoutManager (getContext (),4,GridLayoutManager.VERTICAL,false));
-                viewModelImage.setImageResource (R.drawable.ic_view_model_line);
-                viewModelImage.refreshDrawableState ();
-            }
-            recyclerView.getAdapter ().notifyDataSetChanged ();
-        });
+        viewModelImage.setOnClickListener (v -> changeLayout ());
         phoneModel = ViewModelProviders.of (this).get (PhoneModel.class);
         phoneModel.setContext (getContext ());
         List<Integer> resources = new ArrayList<> ();
@@ -100,6 +91,9 @@ public class PhoneFragment extends Fragment {
                 childViews.forEach (view -> {
                     if(view instanceof CheckBox){
                         view.setVisibility (View.VISIBLE);
+                        RelativeLayout relativeLayout = (RelativeLayout)view.getParent ();
+                        relativeLayout.setVisibility (View.VISIBLE);
+                        relativeLayout.setOnClickListener (layout-> view.performClick ());
                     }else if(view.getId ()==R.id.arrow_image){
                         view.setVisibility (View.GONE);
                     }
@@ -112,6 +106,37 @@ public class PhoneFragment extends Fragment {
         });
         return root;
     }
+    /**
+    * @Author peiyongdong
+    * @Description ( 更改布局 )
+    * @Date 10:39 2019/10/23
+    * @Param []
+    * @return void
+    **/
+    private void changeLayout(){
+        changeEditStatus ();
+        if (recyclerView.getLayoutManager () instanceof GridLayoutManager){
+            layoutType = LAYOUT_LINEAR;
+            cardContentAdapter.setOnSetContetnViewListener ((holder, fileBean) ->setLinearViewHolder (holder,fileBean));
+            recyclerView.removeItemDecorationAt (0);
+            recyclerView.setLayoutManager (new LinearLayoutManager (getContext (),LinearLayoutManager.VERTICAL,false));
+            viewModelImage.setImageResource (R.drawable.ic_view_model_grid);
+        }else{
+            layoutType = LAYOUT_GRID;
+            cardContentAdapter.setOnSetContetnViewListener ((holder, fileBean) ->setGridViewHolder(holder,fileBean));
+            recyclerView.addItemDecoration (new GridLayoutItemDecoration (getContext (),4,60));
+            recyclerView.setLayoutManager (new GridLayoutManager (getContext (),4,GridLayoutManager.VERTICAL,false));
+            viewModelImage.setImageResource (R.drawable.ic_view_model_line);
+        }
+        recyclerView.getAdapter ().notifyDataSetChanged ();
+    }
+    /**
+    * @Author peiyongdong
+    * @Description ( 设置网格布局 )
+    * @Date 10:10 2019/10/23
+    * @Param [holder, fileBean]
+    * @return void
+    **/
     private void setGridViewHolder(CardViewHolder holder, FileBean fileBean){
         File file = new File (fileBean.getPath ());
         ((LinearLayout)holder.itemView.findViewById (R.id.file_item_layout)).setOrientation (LinearLayout.VERTICAL);
@@ -136,15 +161,20 @@ public class PhoneFragment extends Fragment {
                 case R.id.file_info:
                 case R.id.arrow_image:
                     view.setVisibility (View.GONE);
-                    break;
-                default:
+                        break;
+                case R.id.image_check_btn:
+                    RelativeLayout layout = (RelativeLayout)view.getParent ();
+                    ViewGroup.LayoutParams layoutParams = layout.getLayoutParams ();
+                    layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    layoutParams.height = GridLayoutItemDecoration.dip2px (getContext (),65);
+                    layout.setLayoutParams (layoutParams);
                     break;
             }
         });
     }
     /**
     * @Author peiyongdong
-    * @Description ( 设置CardViewHolder )
+    * @Description ( 设置线性布局 )
     * @Date 23:37 2019/10/21
     * @Param [holder, fileBean]
     * @return void
@@ -161,7 +191,7 @@ public class PhoneFragment extends Fragment {
                 case R.id.file_name:
                     LinearLayout linearLayout = (LinearLayout)view.getParent ();
                     ViewGroup.LayoutParams params = linearLayout.getLayoutParams ();
-                    params.width = WindowManager.LayoutParams.WRAP_CONTENT;
+                    params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
                     linearLayout.setLayoutParams (params);
                     ((TextView)view).setText (file.getName ());
                     TextView textView = (TextView)view;
@@ -180,13 +210,15 @@ public class PhoneFragment extends Fragment {
                     }
                     break;
                 case R.id.arrow_image:
-                    if(file.isDirectory ()){
-                        view.setVisibility (View.VISIBLE);
-                    }else {
-                        view.setVisibility (View.GONE);
-                    }
+                    int status = file.isDirectory ()?View.VISIBLE:View.GONE;
+                    view.setVisibility (status);
                     break;
                 case R.id.image_check_btn:
+                    RelativeLayout layout = (RelativeLayout)view.getParent ();
+                    ViewGroup.LayoutParams layoutParams = layout.getLayoutParams ();
+                    layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    layoutParams.height =GridLayoutItemDecoration.dip2px (getContext (),40);
+                    layout.setLayoutParams (layoutParams);
                     CheckBox checkBox = (CheckBox) view;
                     checkBox.setOnCheckedChangeListener ((buttonView, isChecked) -> {
                         if(isChecked){
@@ -198,6 +230,13 @@ public class PhoneFragment extends Fragment {
             }
         });
     }
+    /**
+    * @Author peiyongdong
+    * @Description ( 设置文件图片 )
+    * @Date 10:10 2019/10/23
+    * @Param [file, imageView, holder, fileBean, outWidth, outHeight]
+    * @return void
+    **/
     private void setFileTypeImage(File file,ImageView imageView,CardViewHolder holder,FileBean fileBean,int outWidth,int outHeight){
         if(file.isDirectory ()){
             holder.itemView.setOnClickListener (v -> {
@@ -222,6 +261,13 @@ public class PhoneFragment extends Fragment {
             holder.itemView.setOnClickListener (null);
         }
     }
+    /**
+    * @Author peiyongdong
+    * @Description ( 根据parentId刷新数据 )
+    * @Date 11:11 2019/10/23
+    * @Param [parentId]
+    * @return void
+    **/
     public void refreshAdapterByParentId(int parentId){
         if(parentId>=0){
             for(int i=titleLayout.getChildCount ()-1;i>0;i--){
@@ -238,13 +284,23 @@ public class PhoneFragment extends Fragment {
             cardContentAdapter.notifyDataSetChanged ();
         }
     }
-    public void backByEditStatus(){
+    /**
+    * @Author peiyongdong
+    * @Description ( 取消编辑状态 )
+    * @Date 10:09 2019/10/23
+    * @Param []
+    * @return void
+    **/
+    public void changeEditStatus(){
         if(isEidtStatus ()){
             List<View> childViews = ViewUtil.getAllChildViews (root);
             childViews.forEach (view -> {
                 if(view instanceof CheckBox){
-                    view.setVisibility (View.GONE);
-                }else if(view.getId ()==R.id.arrow_image){
+                    CheckBox checkBox = (CheckBox)view;
+                    checkBox.setChecked (false);
+                    checkBox.setVisibility (View.GONE);
+                    ((RelativeLayout)checkBox.getParent ()).setVisibility (View.GONE);
+                }else if(layoutType==LAYOUT_LINEAR&&view.getId ()==R.id.arrow_image){
                     view.setVisibility (View.VISIBLE);
                 }
             });

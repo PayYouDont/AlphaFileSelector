@@ -16,7 +16,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.payudn.selector.ui.CollectFragment;
-import com.payudn.selector.ui.DocumentFragment;
+import com.payudn.selector.ui.document.DocumentFragment;
 import com.payudn.selector.ui.MoreFragment;
 import com.payudn.selector.ui.MusicFragment;
 import com.payudn.selector.ui.phone.PhoneFragment;
@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_main);
+        getPermission();
         searchView = findViewById (R.id.query_view);
         searchView.setOnClickListener (v -> {
             System.out.println ("搜索操作");
@@ -81,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         mTabLayout.getTabAt (0).select ();
         mTabLayout.addOnTabSelectedListener (this);
         permissionHelper = new PermissionHelper(this);
-        getPermission();
     }
 
     @Override
@@ -115,7 +115,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.MEDIA_CONTENT_CONTROL
-        ).onSuccess(() -> {})
+        ).onSuccess(() -> {
+
+        })
                 .onDenied(() -> Toast.makeText (this,"权限被拒绝！将无法获取到WiFi信息!",Toast.LENGTH_SHORT).show ())
                 .onNeverAskAgain(() -> Toast.makeText (this,"权限被拒绝！将无法获取到WiFi信息,下次不会再询问了！",Toast.LENGTH_SHORT).show ()).run();
     }
@@ -125,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
                 PhoneFragment fragment = (PhoneFragment) fragmentList.get (0);
                 if(fragment.isEidtStatus ()){
-                    fragment.backByEditStatus ();
+                    fragment.changeEditStatus ();
                     return true;
                 }
                 int parentId = fragment.getParentId ();
