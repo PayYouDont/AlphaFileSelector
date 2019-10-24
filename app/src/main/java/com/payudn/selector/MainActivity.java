@@ -16,13 +16,13 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.payudn.selector.ui.CollectFragment;
-import com.payudn.selector.ui.document.DocumentFragment;
 import com.payudn.selector.ui.MoreFragment;
 import com.payudn.selector.ui.MusicFragment;
-import com.payudn.selector.ui.phone.PhoneFragment;
-import com.payudn.selector.ui.picture.PictureFragment;
 import com.payudn.selector.ui.RecentFragment;
 import com.payudn.selector.ui.VideoFragment;
+import com.payudn.selector.ui.document.DocumentFragment;
+import com.payudn.selector.ui.phone.PhoneFragment;
+import com.payudn.selector.ui.picture.PictureFragment;
 import com.payudn.selector.util.FileUtil;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import java.util.List;
 
 import ru.alexbykov.nopermission.PermissionHelper;
 
-public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
+public class MainActivity extends AppCompatActivity {
     private PermissionHelper permissionHelper;
     private TabLayout mTabLayout;
     public static SearchView searchView;
@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_main);
+        permissionHelper = new PermissionHelper(this);
         getPermission();
         searchView = findViewById (R.id.query_view);
         searchView.setOnClickListener (v -> {
@@ -77,32 +78,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 return tabTexts[position];
             }
         });
-        viewPager.setOffscreenPageLimit(2);
+        viewPager.setOffscreenPageLimit(1);
         mTabLayout.setupWithViewPager (viewPager);
         mTabLayout.getTabAt (0).select ();
-        mTabLayout.addOnTabSelectedListener (this);
-        permissionHelper = new PermissionHelper(this);
-    }
-
-    @Override
-    public void onTabSelected(TabLayout.Tab tab) {
-        loadFragment (tab);
-    }
-
-    @Override
-    public void onTabUnselected(TabLayout.Tab tab) {
-
-    }
-
-    @Override
-    public void onTabReselected(TabLayout.Tab tab) {
-
-    }
-    private void loadFragment(TabLayout.Tab tab){
-        switch (tab.getPosition ()){
-            case 0:
-
-        }
+        //mTabLayout.addOnTabSelectedListener (this);
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -134,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 if(parentId>0){
                     parentId = FileUtil.findById (this,parentId).getParentId ();
                 }
-                fragment.refreshAdapterByParentId (parentId);
+                fragment.refreshAdapterByParentId (parentId,fragment.getTitleLayout ());
             }
         }
         return true;

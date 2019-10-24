@@ -21,9 +21,9 @@ public class DocumentModel extends ViewModel {
     public DocumentModel() {
         fileData = new MutableLiveData<> ();
     }
-    public MutableLiveData<List<FileBean>> getFiles(int parent, FileUtil.OnFileListener onFileListener) {
+    public MutableLiveData<List<FileBean>> getFiles() {
         if(context!=null){
-            List<FileBean> fileList = FileUtil.getFileByParentId (context,parent,onFileListener);
+            List<FileBean> fileList = FileUtil.getFilesByType (context,FileUtil.TYPE_DOC);
             fileData.setValue (fileList);
         }
         return fileData;
